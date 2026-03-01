@@ -1,0 +1,7 @@
+.ssh/*
+!.ssh/.gitkeep
+
+.env
+
+*.pyc
+__pycache__/
