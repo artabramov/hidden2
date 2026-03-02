@@ -1,5 +1,5 @@
 /opt/hidden/                ← git clone
-/etc/hidden/                ← hidden.env
+/etc/hidden/                ← секреты (gocryptfs.key)
 /var/lib/hidden/            ← данные
          ├── encrypted/     ← зашифрованныые данные (gocryptfs cipherdir)
          │   └── ...
