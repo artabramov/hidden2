@@ -1,5 +1,12 @@
 .PHONY: develop install
 
+APP_DIR := /opt/hidden
+ETC_DIR := /etc/hidden
+DATA_DIR := /var/lib/hidden
+CIPHER_DIR := $(DATA_DIR)/encrypted
+MOUNT_DIR := $(DATA_DIR)/decrypted
+ENV_FILE := $(ETC_DIR)/hidden.env
+
 develop:
 	cp -n .env.example .env || true
 	docker build -t hidden .
@@ -10,8 +17,23 @@ develop:
 	-v $$HOME/.ssh:/root/.ssh:ro --name hidden --env-file .env hidden
 
 install:
-	rm -rf /hidden
-	mkdir -p /hidden
-	cp -r . /hidden
-	cp -n /hidden/.env.example /hidden/.env || true
-	pip install -r /hidden/requirements.txt
+	test "$$(id -u)" = "0" || (echo "Run make install as root" >&2; exit 1)
+	DEBIAN_FRONTEND=noninteractive apt-get update
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+		python3 python3-pip python3-setuptools python3-wheel \
+		git openssh-client gocryptfs fuse3 rsync
+
+	mkdir -p $(APP_DIR) $(ETC_DIR) $(CIPHER_DIR) $(MOUNT_DIR)
+
+	rsync -a --delete \
+		--exclude '.git' \
+		--exclude '__pycache__' \
+		--exclude '*.pyc' \
+		--exclude '.env' \
+		./ $(APP_DIR)/
+
+	cp -n $(APP_DIR)/.env.example $(ENV_FILE) || true
+
+	chmod +x $(APP_DIR)/entrypoint.sh
+
+	python3 -m pip install --break-system-packages --no-cache-dir -r $(APP_DIR)/requirements.txt

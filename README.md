@@ -12,8 +12,9 @@ Volumes:
 Files:
 
 hidden/
-├── .env.example
+├── .dockerignore
 ├── .gitignore
+├── .env.example
 ├── Dockerfile
 ├── entrypoint.sh     ← универсальная точка входа (для любого способа запуска)
 ├── Makefile
