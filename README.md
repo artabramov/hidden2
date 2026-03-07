@@ -46,7 +46,6 @@ apt-get update \
 
 cd hidden2 \
  && make install \
- && sed -i 's/\r$//' /etc/hidden/hidden.env \
  && cd /opt/hidden \
  && set -a \
  && . /etc/hidden/hidden.env \
