@@ -140,6 +140,7 @@ fi
   done
 ) &
 
+# Select uvicorn binary.
 if [ -x /opt/hidden/.venv/bin/uvicorn ]; then
   UVICORN_BIN=/opt/hidden/.venv/bin/uvicorn
 else
