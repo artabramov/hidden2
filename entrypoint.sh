@@ -140,8 +140,14 @@ fi
   done
 ) &
 
+if [ -x /opt/hidden/.venv/bin/uvicorn ]; then
+  UVICORN_BIN=/opt/hidden/.venv/bin/uvicorn
+else
+  UVICORN_BIN=uvicorn
+fi
+
 # Make uvicorn PID 1 so it receives signals directly.
-exec uvicorn app.main:app \
+exec "$UVICORN_BIN" app.main:app \
   --host "$UVICORN_HOST" \
   --port "$UVICORN_PORT" \
   --workers "$UVICORN_WORKERS"
