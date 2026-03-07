@@ -12,36 +12,16 @@ umask 077
 : "${UVICORN_PORT:?UVICORN_PORT is not defined}"
 : "${UVICORN_WORKERS:?UVICORN_WORKERS is not defined}"
 
-# Validate integer values early, before doing any real work.
-case "$GOCRYPTFS_PASSPHRASE_LENGTH" in
-  ''|*[!0-9]*)
-    echo "[fatal] GOCRYPTFS_PASSPHRASE_LENGTH must be an integer" >&2
-    exit 1
-    ;;
-esac
+: "${RESTIC_ENABLE:?RESTIC_ENABLE is not defined}"
+if [ "$RESTIC_ENABLE" = "true" ]; then
+  : "${RESTIC_SECRETS_DIR:?RESTIC_SECRETS_DIR is not defined}"
+  : "${RESTIC_KEY_FILENAME:?RESTIC_KEY_FILENAME is not defined}"
+  : "${RESTIC_REPOSITORY:?RESTIC_REPOSITORY is not defined}"
+  : "${RESTIC_CRON_SCHEDULE:?RESTIC_CRON_SCHEDULE is not defined}"
+  : "${RESTIC_FORGET_ARGS:?RESTIC_FORGET_ARGS is not defined}"
+fi
 
-case "$GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS" in
-  ''|*[!0-9]*)
-    echo "[fatal] GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS must be an integer" >&2
-    exit 1
-    ;;
-esac
-
-case "$UVICORN_PORT" in
-  ''|*[!0-9]*)
-    echo "[fatal] UVICORN_PORT must be an integer" >&2
-    exit 1
-    ;;
-esac
-
-case "$UVICORN_WORKERS" in
-  ''|*[!0-9]*)
-    echo "[fatal] UVICORN_WORKERS must be an integer" >&2
-    exit 1
-    ;;
-esac
-
-# Ensure required binaries are present in the image.
+# Ensure required gocryptfs binaries are present.
 command -v gocryptfs >/dev/null 2>&1 || {
   echo "[fatal] gocryptfs is not installed" >&2
   exit 1
@@ -139,6 +119,36 @@ fi
     sleep "$GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS"
   done
 ) &
+
+if [ "$RESTIC_ENABLE" = "true" ]; then
+  
+  # Ensure restic binary exists.
+  command -v restic >/dev/null 2>&1 || {
+    echo "[fatal] restic is not installed" >&2
+    exit 1
+  }
+
+  RESTIC_KEY_PATH="${RESTIC_SECRETS_DIR}/${RESTIC_KEY_FILENAME}"
+  mkdir -p "$RESTIC_SECRETS_DIR"
+
+  if [ ! -s "$RESTIC_KEY_PATH" ]; then
+    echo "[fatal] restic key file is missing or empty: $RESTIC_KEY_PATH" >&2
+    exit 1
+  fi
+
+  # Ensure repository directory exists for local filesystem backend.
+  # If RESTIC_REPOSITORY is later changed to a remote backend (sftp, s3, etc.),
+  # this line must be removed.
+  mkdir -p "$RESTIC_REPOSITORY"
+
+  # Initialize repository exactly once.
+  # "restic cat config" is used as a generic repository access check.
+  # If it fails, initialization is attempted.
+  if ! restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_KEY_PATH" cat config >/dev/null 2>&1; then
+    restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_KEY_PATH" init
+    echo "[restic] initialized: $RESTIC_REPOSITORY"
+  fi
+fi
 
 # Select uvicorn binary.
 if [ -x /opt/hidden/.venv/bin/uvicorn ]; then
