@@ -32,7 +32,7 @@ mkdir -p "$GOCRYPTFS_SECRETS_DIR" "$GOCRYPTFS_CIPHERDIR" "$GOCRYPTFS_MOUNTPOINT"
 GOCRYPTFS_PASSPHRASE_PATH="${GOCRYPTFS_SECRETS_DIR}/${GOCRYPTFS_PASSPHRASE_FILENAME}"
 GOCRYPTFS_CONFIG_PATH="${GOCRYPTFS_CIPHERDIR}/gocryptfs.conf"
 
-# First boot: generate passphrase once.
+# First boot: generate gocryptfs passphrase.
 if [ ! -s "$GOCRYPTFS_PASSPHRASE_PATH" ]; then
   # Head may terminate the pipe early; ignore the resulting SIGPIPE-related non-zero exit.
   tr -dc 'A-Za-z0-9' </dev/urandom | head -c "$GOCRYPTFS_PASSPHRASE_LENGTH" >"$GOCRYPTFS_PASSPHRASE_PATH" || true
@@ -121,7 +121,7 @@ fi
 ) &
 
 if [ "$RESTIC_ENABLE" = "true" ]; then
-  
+
   # Ensure restic binary exists.
   command -v restic >/dev/null 2>&1 || {
     echo "[fatal] restic is not installed" >&2
@@ -130,6 +130,20 @@ if [ "$RESTIC_ENABLE" = "true" ]; then
 
   RESTIC_KEY_PATH="${RESTIC_SECRETS_DIR}/${RESTIC_KEY_FILENAME}"
   mkdir -p "$RESTIC_SECRETS_DIR"
+
+  # First boot: generate restic key once.
+  if [ ! -s "$RESTIC_KEY_PATH" ]; then
+    # Head may terminate the pipe early; ignore the resulting SIGPIPE-related non-zero exit.
+    tr -dc 'A-Za-z0-9' </dev/urandom | head -c "$GOCRYPTFS_PASSPHRASE_LENGTH" >"$RESTIC_KEY_PATH" || true
+
+    if [ -s "$RESTIC_KEY_PATH" ]; then
+      chmod 600 "$RESTIC_KEY_PATH"
+      echo "[restic] key generated: $RESTIC_KEY_PATH"
+    else
+      echo "[fatal] failed to generate restic key: $RESTIC_KEY_PATH" >&2
+      exit 1
+    fi
+  fi
 
   if [ ! -s "$RESTIC_KEY_PATH" ]; then
     echo "[fatal] restic key file is missing or empty: $RESTIC_KEY_PATH" >&2
