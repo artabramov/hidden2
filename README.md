@@ -1,27 +1,57 @@
-Volumes:
 
-/opt/hidden/                ← git clone
-/etc/hidden/                ← секреты (gocryptfs.key)
-/var/lib/hidden/            ← данные
-         ├── encrypted/     ← зашифрованныые данные (gocryptfs cipherdir)
-         │   └── ...
-         └── decrypted/     ← расшифрованные данные (gocryptfs mountpoint)
-             ├── files/     ← загруженные файлы
-             └── hidden.db  ← база данных SQLite
+/opt/hidden/               # application code (git clone)
+/etc/hidden/               # runtime config and secrets
+    ├── hidden.env         # environment variables
+    ├── gocryptfs.key      # gocryptfs passphrase
+    └── restic.key         # restic repository key
+/var/lib/hidden/           # application data
+    ├── encrypted/         # gocryptfs cipherdir
+    └── decrypted/         # gocryptfs mountpoint
+        ├── files/         # uploaded files
+        └── db/
+            └── hidden.db  # SQLite database
+/mnt/backup/hidden/        # backup repository example location
+
+
 
 Files:
 
 hidden/
+├── .vscode/
+│   ├── launch.json
+│   └── settings.json
 ├── .dockerignore
 ├── .gitignore
 ├── .env.example
 ├── Dockerfile
-├── entrypoint.sh     ← универсальная точка входа (для любого способа запуска)
+├── entrypoint.sh     # универсальная точка входа для любого способа запуска
 ├── Makefile
 ├── requirements.txt
 ├── README.md
-├── app/
-│   └── main.py
+├── alembic.ini
+├── alembic/
+│   ├── env.py
+│   ├── script.py.mako
+│   └── versions/
+│       └── ...
+└── app/
+    ├── main.py
+    ├── config.py      # загрузка env и конфигурации
+    ├── db.py          # подключение SQLite
+    ├── dependencies.py
+    ├── models/    # ORM модели
+    │   └── ...
+    ├── schemas/   # pydantic схемы API
+    │   └── ...
+    ├── routers/   # HTTP endpoints
+    │   └── ...
+    ├── services/  # application use-cases coordinating repository and managers
+    │   ├── auth_service.py  # логин, токены, проверка учетных данных
+    │   ├── file_service.py  # загрузка, удаление, перемещение файлов
+    │   └── ...
+    └── managers/
+        ├── entity_manager.py  # работа с базой данных (CRUDL)
+        └── file_manager.py    # работа с файлами
 
 Processes:
 
