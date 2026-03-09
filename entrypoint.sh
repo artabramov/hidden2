@@ -21,19 +21,15 @@ set -a
 . "$ENV_PATH"
 set +a
 
-: "${GOCRYPTFS_SECRETS_DIR:?GOCRYPTFS_SECRETS_DIR is not defined}"
 : "${GOCRYPTFS_CIPHERDIR:?GOCRYPTFS_CIPHERDIR is not defined}"
 : "${GOCRYPTFS_MOUNTPOINT:?GOCRYPTFS_MOUNTPOINT is not defined}"
-: "${GOCRYPTFS_PASSPHRASE_FILENAME:?GOCRYPTFS_PASSPHRASE_FILENAME is not defined}"
 : "${GOCRYPTFS_PASSPHRASE_LENGTH:?GOCRYPTFS_PASSPHRASE_LENGTH is not defined}"
 : "${GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS:?GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS is not defined}"
 : "${UVICORN_HOST:?UVICORN_HOST is not defined}"
 : "${UVICORN_PORT:?UVICORN_PORT is not defined}"
 
-: "${RESTIC_ENABLE:?RESTIC_ENABLE is not defined}"
-if [ "$RESTIC_ENABLE" = "true" ]; then
-  : "${RESTIC_SECRETS_DIR:?RESTIC_SECRETS_DIR is not defined}"
-  : "${RESTIC_KEY_FILENAME:?RESTIC_KEY_FILENAME is not defined}"
+: "${RESTIC_ENABLED:?RESTIC_ENABLED is not defined}"
+if [ "$RESTIC_ENABLED" = "true" ]; then
   : "${RESTIC_REPOSITORY:?RESTIC_REPOSITORY is not defined}"
   : "${RESTIC_CRON_SCHEDULE:?RESTIC_CRON_SCHEDULE is not defined}"
   : "${RESTIC_FORGET_ARGS:?RESTIC_FORGET_ARGS is not defined}"
@@ -45,9 +41,9 @@ command -v gocryptfs >/dev/null 2>&1 || {
   exit 1
 }
 
-mkdir -p "$GOCRYPTFS_SECRETS_DIR" "$GOCRYPTFS_CIPHERDIR" "$GOCRYPTFS_MOUNTPOINT"
+mkdir -p "$SECRETS_DIR" "$GOCRYPTFS_CIPHERDIR" "$GOCRYPTFS_MOUNTPOINT"
 
-GOCRYPTFS_PASSPHRASE_PATH="${GOCRYPTFS_SECRETS_DIR}/${GOCRYPTFS_PASSPHRASE_FILENAME}"
+GOCRYPTFS_PASSPHRASE_PATH="${SECRETS_DIR}/gocryptfs.key"
 GOCRYPTFS_CONFIG_PATH="${GOCRYPTFS_CIPHERDIR}/gocryptfs.conf"
 
 # First boot: generate gocryptfs passphrase.
@@ -138,7 +134,7 @@ fi
   done
 ) &
 
-if [ "$RESTIC_ENABLE" = "true" ]; then
+if [ "$RESTIC_ENABLED" = "true" ]; then
 
   # Ensure restic binary exists.
   command -v restic >/dev/null 2>&1 || {
@@ -146,8 +142,8 @@ if [ "$RESTIC_ENABLE" = "true" ]; then
     exit 1
   }
 
-  RESTIC_KEY_PATH="${RESTIC_SECRETS_DIR}/${RESTIC_KEY_FILENAME}"
-  mkdir -p "$RESTIC_SECRETS_DIR"
+  RESTIC_KEY_PATH="${SECRETS_DIR}/restic.key"
+  mkdir -p "$SECRETS_DIR"
 
   # First boot: generate restic key once.
   if [ ! -s "$RESTIC_KEY_PATH" ]; then
