@@ -2,6 +2,25 @@
 set -eu
 umask 077
 
+SECRETS_DIR=/etc/hidden
+ENV_FILENAME=hidden.env
+ENV_PATH="${SECRETS_DIR}/${ENV_FILENAME}"
+
+# ensure secrets directory exists
+mkdir -p "$SECRETS_DIR"
+
+# create env file on first run
+if [ ! -f "$ENV_PATH" ]; then
+    cp /opt/hidden/.env.example "$ENV_PATH"
+    chmod 600 "$ENV_PATH"
+    echo "[hidden] created default env: $ENV_PATH"
+fi
+
+# load environment variables
+set -a
+. "$ENV_PATH"
+set +a
+
 : "${GOCRYPTFS_SECRETS_DIR:?GOCRYPTFS_SECRETS_DIR is not defined}"
 : "${GOCRYPTFS_CIPHERDIR:?GOCRYPTFS_CIPHERDIR is not defined}"
 : "${GOCRYPTFS_MOUNTPOINT:?GOCRYPTFS_MOUNTPOINT is not defined}"
@@ -10,7 +29,6 @@ umask 077
 : "${GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS:?GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS is not defined}"
 : "${UVICORN_HOST:?UVICORN_HOST is not defined}"
 : "${UVICORN_PORT:?UVICORN_PORT is not defined}"
-: "${UVICORN_WORKERS:?UVICORN_WORKERS is not defined}"
 
 : "${RESTIC_ENABLE:?RESTIC_ENABLE is not defined}"
 if [ "$RESTIC_ENABLE" = "true" ]; then

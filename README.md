@@ -21,6 +21,7 @@ hidden/
 │   ├── launch.json
 │   └── settings.json
 ├── .dockerignore
+├── .gitattributes
 ├── .gitignore
 ├── .env.example
 ├── Dockerfile
