@@ -46,13 +46,13 @@ hidden/
     │   └── ...
     ├── routers/   # HTTP endpoints
     │   └── ...
-    ├── services/  # application use-cases coordinating repository and managers
+    ├── services/  # application use-cases coordinating
     │   ├── auth_service.py  # логин, токены, проверка учетных данных
-    │   ├── file_service.py  # загрузка, удаление, перемещение файлов
+    │   ├── file_service.py  # загрузка, обработка, перемещение файлов
     │   └── ...
-    └── managers/
-        ├── entity_manager.py  # работа с базой данных (CRUDL)
-        └── file_manager.py    # работа с файлами
+    └── repositories/
+        ├── file_repository.py  # работа с файлами
+        └── orm_repository.py   # работа с базой данных (CRUDL)
 
 Processes:
 

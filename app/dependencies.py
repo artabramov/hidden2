@@ -1,8 +1,11 @@
-from collections.abc import AsyncGenerator
+from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.db import get_session
+from app.repositories.orm_repository import ORMRepository
 
 
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async for session in get_session():
-        yield session
+def get_orm_repository(
+    session: AsyncSession = Depends(get_session),
+) -> ORMRepository:
+    return ORMRepository(session)

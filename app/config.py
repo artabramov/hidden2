@@ -1,11 +1,25 @@
-from pathlib import Path
-
+import os
+from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class Settings(BaseSettings):
-    SQLITE_DIR: str
-    SQLITE_FILENAME: str
+class Config(BaseSettings):
+    """
+    Config values are provided by the runtime environment (entrypoint
+    script or container runtime) and validated by pydantic-settings at
+    application startup.
+    """
+
+    GOCRYPTFS_CIPHERDIR: str
+    GOCRYPTFS_MOUNTPOINT: str
+    GOCRYPTFS_PASSPHRASE_LENGTH: int
+    GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS: int
+
+    RESTIC_ENABLED: bool
+    RESTIC_REPOSITORY: Optional[str] = None
+    RESTIC_CRON_SCHEDULE: Optional[str] = None
+    RESTIC_FORGET_ARGS: Optional[str] = None
+
     SQLITE_JOURNAL_MODE: str
     SQLITE_SYNCHRONOUS: str
     SQLITE_BUSY_TIMEOUT: int
@@ -19,12 +33,14 @@ class Settings(BaseSettings):
     )
 
     @property
-    def sqlite_path(self) -> Path:
-        return Path(self.SQLITE_DIR) / self.SQLITE_FILENAME
+    def sqlite_path(self) -> str:
+        """Absolute filesystem path to the SQLite database file."""
+        return os.path.join(self.GOCRYPTFS_MOUNTPOINT, "hidden.db")
 
     @property
-    def database_url(self) -> str:
-        return f"sqlite+aiosqlite:///{self.sqlite_path}"
+    def sqlite_url(self) -> str:
+        """SQLAlchemy database URL for the SQLite backend."""
+        return "sqlite+aiosqlite:///" + self.sqlite_path
 
 
-settings = Settings()
+config = Config()
