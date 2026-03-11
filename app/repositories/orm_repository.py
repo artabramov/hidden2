@@ -1,27 +1,15 @@
-from __future__ import annotations
-
-from typing import Any, TypeVar
-
+from typing import Any
 from sqlalchemy import Select, asc, desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.sql import ColumnElement
-from sqlalchemy.sql.selectable import Subquery
+from app.db import Base
 
-
-class Base(DeclarativeBase):
-    pass
-
-
-ModelT = TypeVar("ModelT", bound=Base)
 
 ID = "id"
-
 ORDER_BY = "order_by"
 ORDER = "order"
 OFFSET = "offset"
 LIMIT = "limit"
-
 ASC = "asc"
 DESC = "desc"
 RAND = "rand"
@@ -31,6 +19,10 @@ RESERVED_KEYS = {ORDER_BY, ORDER, OFFSET, LIMIT}
 
 class ORMRepository:
     """
+    Generic async repository for SQLAlchemy ORM models. Provides basic
+    CRUD operations, filtering, ordering, pagination, and utilities for
+    building dynamic queries.
+
     Filtering syntax:
     - field=value
     - field__eq=value
@@ -44,7 +36,7 @@ class ORMRepository:
     - field__ilike="%abc%"
     - field__is=None
     - field__isnot=None
-    - field__subquery=subquery
+    - field__subquery=select(...)
     """
 
     def __init__(self, session: AsyncSession):
@@ -52,14 +44,11 @@ class ORMRepository:
 
     async def insert(
         self,
-        obj: ModelT,
+        obj: Base,
         *,
         flush: bool = True,
         commit: bool = False,
-    ) -> ModelT:
-        """
-        Add an object to the current session.
-        """
+    ) -> Base:
         self.session.add(obj)
 
         if flush:
@@ -72,19 +61,13 @@ class ORMRepository:
 
     async def select(
         self,
-        cls: type[ModelT],
+        cls: type[Base],
         obj_id: Any | None = None,
         **filters: Any,
-    ) -> ModelT | None:
-        """
-        Return the first matching object or None.
+    ) -> Base | None:
+        if obj_id is not None and ID in filters:
+            raise ValueError("Use either obj_id or id filter, not both")
 
-        Examples:
-            await manager.select(User, 1)
-            await manager.select(User, id=1)
-            await manager.select(User, email="a@b.com")
-            await manager.select(User, age__ge=18)
-        """
         query = select(cls)
 
         if obj_id is not None:
@@ -97,16 +80,11 @@ class ORMRepository:
 
     async def update(
         self,
-        obj: ModelT,
+        obj: Base,
         *,
         flush: bool = True,
         commit: bool = False,
-    ) -> ModelT:
-        """
-        Persist changes for an object already attached to the session.
-
-        For the normal ORM flow, load object -> mutate fields -> update().
-        """
+    ) -> Base:
         if flush:
             await self.session.flush()
 
@@ -117,14 +95,11 @@ class ORMRepository:
 
     async def delete(
         self,
-        obj: ModelT,
+        obj: Base,
         *,
         flush: bool = True,
         commit: bool = False,
     ) -> None:
-        """
-        Delete an ORM object.
-        """
         await self.session.delete(obj)
 
         if flush:
@@ -133,20 +108,11 @@ class ORMRepository:
         if commit:
             await self.session.commit()
 
-    async def list(
+    async def select_all(
         self,
-        cls: type[ModelT],
+        cls: type[Base],
         **filters: Any,
-    ) -> list[ModelT]:
-        """
-        Return a list of matching objects.
-
-        Reserved kwargs:
-            order_by="created_at"
-            order="asc" | "desc" | "rand"
-            offset=0
-            limit=100
-        """
+    ) -> list[Base]:
         query = select(cls).where(*self._build_where(cls, **filters))
         query = self._apply_ordering(cls, query, **filters)
         query = self._apply_pagination(query, **filters)
@@ -168,17 +134,9 @@ class ORMRepository:
         cls: type[Base],
         column_name: str,
         **filters: Any,
-    ) -> Subquery:
-        """
-        Build a subquery that selects exactly one column.
-
-        Example:
-            subq = manager.make_subquery(Post, "user_id", published=True)
-            users = await manager.list(User, id__subquery=subq)
-        """
+    ):
         column = self._get_column(cls, column_name)
-        query = select(column).where(*self._build_where(cls, **filters))
-        return query.subquery()
+        return select(column).where(*self._build_where(cls, **filters))
 
     def _build_where(
         self,
@@ -225,7 +183,7 @@ class ORMRepository:
             elif operator == "isnot":
                 conditions.append(column.is_not(value))
             elif operator == "subquery":
-                conditions.append(column.in_(self._normalize_subquery(value)))
+                conditions.append(column.in_(value))
             else:
                 raise ValueError(
                     f"Unsupported operator '{operator}' in filter '{key}'"
@@ -244,7 +202,6 @@ class ORMRepository:
 
         if order == RAND:
             from sqlalchemy import func
-
             return query.order_by(func.random())
 
         if order_by_name is None:
@@ -282,12 +239,6 @@ class ORMRepository:
         return query
 
     def _split_filter_key(self, key: str) -> tuple[str, str]:
-        """
-        Examples:
-            "id" -> ("id", "eq")
-            "age__ge" -> ("age", "ge")
-            "id__subquery" -> ("id", "subquery")
-        """
         if "__" not in key:
             return key, "eq"
 
@@ -304,12 +255,3 @@ class ORMRepository:
                 f"Model '{cls.__name__}' has no mapped attribute '{column_name}'"
             )
         return getattr(cls, column_name)
-
-    def _normalize_subquery(self, value: Any):
-        """
-        Accept a SQLAlchemy Select or Subquery-like object for IN (subquery).
-        """
-        if hasattr(value, "select"):
-            return value.select()
-
-        return value
