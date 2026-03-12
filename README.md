@@ -1,33 +1,30 @@
-```bash
-/opt/hidden/               # application code (git clone)
-/etc/hidden/               # runtime config and secrets
-    ├── .env               # environment variables
-    ├── gocryptfs.key      # gocryptfs passphrase
-    └── restic.key         # restic repository key
-/var/lib/hidden/           # application data
-    ├── .lock              # maintenance lock file
-    ├── encrypted/         # gocryptfs cipherdir
-    └── decrypted/         # gocryptfs mountpoint
-        ├── files/         # uploaded files
-        └── db/
-            └── hidden.db  # SQLite database
-/mnt/backup/hidden/        # backup repository example location
-```
+# Hidden — secure local encrypted file storage
 
+A small, fast, async, self-hosted file storage service built with `FastAPI`, `SQLAlchemy`, `SQLite`, `gocryptfs`, and `Restic`.
 
-Files:
+All data is stored inside an encrypted directory (`cipherdir`) managed by `gocryptfs` and protected by a detachable secret key (gocryptfs passphrase).
+
+A clean `REST API` exposes filesystem-like operations such as upload, move, copy, rename, and delete, while organizing files into folders.
+
+The system supports file metadata and automatic thumbnail generation.
+
+File versioning is built in — previous file states are preserved as revisions.
+
+The architecture follows a microkernel approach: functionality can be extended with hook-based addons without modifying the core.
+
+Hidden supports multi-user access with role-based permissions and multi-factor authentication.
 
 ```bash
-hidden/
-├── .vscode/
+/opt/hidden/           # application code (git repository)
+├── .vscode/           # editor configuration (VSCode)
 │   ├── launch.json
 │   └── settings.json
 ├── .dockerignore
 ├── .gitattributes
 ├── .gitignore
-├── .env.example
+├── .env.example       # example environment config
 ├── Dockerfile
-├── entrypoint.sh     # универсальная точка входа для любого способа запуска
+├── entrypoint.sh      # universal startup script
 ├── Makefile
 ├── requirements.txt
 ├── README.md
@@ -38,29 +35,47 @@ hidden/
 │   └── versions/
 │       └── ...
 └── app/
-    ├── config.py      # загрузка env и конфигурации
-    ├── db.py          # подключение SQLite
+    ├── config.py
+    ├── db.py
     ├── dependencies.py
     ├── logging.py
-    ├── main.py
+    ├── main.py          # FastAPI application entrypoint
     ├── middleware/
     │   ├── maintenance_lock_middleware.py
     │   ├── request_logging_middleware.py
     │   ├── request_uuid_middleware.py
     │   └── security_headers_middleware.py
-    ├── models/    # SQLAlchemy ORM модели
+    ├── models/    # SQLAlchemy ORM models
     │   └── ...
-    ├── schemas/   # Pydantic схемы API
+    ├── schemas/   # Pydantic API schemas
     │   └── ...
     ├── routers/   # HTTP endpoints
     │   └── ...
-    ├── services/  # application use-cases coordinating
+    ├── services/  # application business logic
     │   ├── auth_service.py  # логин, токены, проверка учетных данных
     │   ├── file_service.py  # загрузка, обработка, перемещение файлов
     │   └── ...
     └── repositories/
         ├── file_repository.py  # работа с файлами
         └── orm_repository.py   # работа с базой данных (CRUDL)
+
+/etc/hidden/       # runtime config and secrets
+├── .env           # runtime environment variables
+├── gocryptfs.key  # gocryptfs passphrase
+└── restic.key     # restic repository password
+
+/var/lib/hidden/   # persistent application data
+├── .lock          # maintenance lock file
+├── encrypted/     # gocryptfs cipherdir
+│   └── ...
+└── decrypted/     # gocryptfs mountpoint
+    ├── files/     # stored files
+    │   └── ...
+    └── db/        # SQLite database
+        └── hidden.db
+
+/mnt/backup/hidden/        # backup repository example location
+└── ...
 ```
 
 Processes:
