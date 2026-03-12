@@ -12,7 +12,7 @@
                 "--port", "5000",
                 "--reload"
             ],
-            "envFile": "/etc/hidden/hidden.env",
+            "envFile": "/etc/hidden/.env",
             "jinja": true,
             "justMyCode": true
         }

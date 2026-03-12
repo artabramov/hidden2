@@ -5,7 +5,7 @@ ETC_DIR := /etc/hidden
 DATA_DIR := /var/lib/hidden
 CIPHER_DIR := $(DATA_DIR)/encrypted
 MOUNT_DIR := $(DATA_DIR)/decrypted
-ENV_FILE := $(ETC_DIR)/hidden.env
+ENV_FILE := $(ETC_DIR)/.env
 VENV_DIR := $(APP_DIR)/.venv
 
 develop:

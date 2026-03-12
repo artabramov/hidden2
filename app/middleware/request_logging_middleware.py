@@ -1,4 +1,4 @@
-# app/middleware/request_log_middleware.py
+# app/middleware/request_logging_middleware.py
 
 import logging
 import time
@@ -7,7 +7,7 @@ from fastapi import Request
 logger = logging.getLogger("app.request")
 
 
-async def request_log_middleware(request: Request, call_next):
+async def request_logging_middleware(request: Request, call_next):
     request_uuid = request.state.request_uuid
     client = request.client.host if request.client else None
     start_time = time.perf_counter()

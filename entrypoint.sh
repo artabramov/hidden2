@@ -3,7 +3,7 @@ set -eu
 umask 077
 
 SECRETS_DIR=/etc/hidden
-ENV_FILENAME=hidden.env
+ENV_FILENAME=.env
 ENV_PATH="${SECRETS_DIR}/${ENV_FILENAME}"
 
 # ensure secrets directory exists

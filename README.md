@@ -1,10 +1,11 @@
 ```bash
 /opt/hidden/               # application code (git clone)
 /etc/hidden/               # runtime config and secrets
-    ├── hidden.env         # environment variables
+    ├── .env               # environment variables
     ├── gocryptfs.key      # gocryptfs passphrase
     └── restic.key         # restic repository key
 /var/lib/hidden/           # application data
+    ├── .lock              # maintenance lock file
     ├── encrypted/         # gocryptfs cipherdir
     └── decrypted/         # gocryptfs mountpoint
         ├── files/         # uploaded files
@@ -43,8 +44,10 @@ hidden/
     ├── logging.py
     ├── main.py
     ├── middleware/
+    │   ├── maintenance_lock_middleware.py
+    │   ├── request_logging_middleware.py
     │   ├── request_uuid_middleware.py
-    │   └── request_log_middleware.py
+    │   └── security_headers_middleware.py
     ├── models/    # SQLAlchemy ORM модели
     │   └── ...
     ├── schemas/   # Pydantic схемы API
@@ -92,7 +95,16 @@ cd hidden2 \
  && make install \
  && cd /opt/hidden \
  && set -a \
- && . /etc/hidden/hidden.env \
+ && . /etc/hidden/.env \
  && set +a \
  && PATH="/opt/hidden/.venv/bin:$PATH" ./entrypoint.sh
 ```
+
+
+
+
+Включить maintenance mode
+touch /var/lib/hidden/.lock
+
+Выключить
+rm /var/lib/hidden/.lock
