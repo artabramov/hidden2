@@ -48,7 +48,7 @@ app.add_middleware(
 async def root(
     orm_repo: ORMRepository = Depends(get_orm_repository),
 ):
-    user = User(email="email22@noreply.no", name="name22")
+    user = User(email="email23@noreply.no", name="name23")
     await orm_repo.insert(user, commit=True)
     selected_user = await orm_repo.select(User, name="name5")
     return {"app": "hidden", "status": "ok"}

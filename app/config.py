@@ -9,10 +9,10 @@ class Config(BaseSettings):
     script or container runtime) and validated by pydantic-settings at
     application startup.
     """
-    MAINTENANCE_LOCK_PATH: str
-
     LOG_LEVEL: str
     LOG_FORMAT: str
+
+    MAINTENANCE_LOCK_PATH: str
 
     GOCRYPTFS_CIPHERDIR: str
     GOCRYPTFS_MOUNTPOINT: str
