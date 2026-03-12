@@ -15,6 +15,40 @@ The architecture follows a microkernel approach: functionality can be extended w
 Hidden supports multi-user access with role-based permissions and multi-factor authentication.
 
 ```bash
+/opt/hidden/       # application code
+└── ...
+
+/etc/hidden/
+└── .env           # runtime configuration
+
+/media/secrets/    # runtime secrets
+├── gocryptfs.key  # gocryptfs passphrase
+└── restic.key     # restic repository password
+
+/media/backups/    # restic backups
+└── ...
+
+/var/lib/hidden/   # persistent application data
+├── .lock          # maintenance lock file
+├── encrypted/     # gocryptfs cipherdir
+│   └── ...
+└── decrypted/     # gocryptfs mountpoint
+    ├── files/     # stored files
+    │   └── ...
+    └── db/        # SQLite database
+        └── ...
+```
+
+
+
+
+
+
+
+
+
+
+```bash
 /opt/hidden/           # application code (git repository)
 ├── .vscode/           # editor configuration (VSCode)
 │   ├── launch.json
@@ -58,25 +92,12 @@ Hidden supports multi-user access with role-based permissions and multi-factor a
     └── repositories/
         ├── file_repository.py  # работа с файлами
         └── orm_repository.py   # работа с базой данных (CRUDL)
-
-/etc/hidden/       # runtime config and secrets
-├── .env           # runtime environment variables
-├── gocryptfs.key  # gocryptfs passphrase
-└── restic.key     # restic repository password
-
-/var/lib/hidden/   # persistent application data
-├── .lock          # maintenance lock file
-├── encrypted/     # gocryptfs cipherdir
-│   └── ...
-└── decrypted/     # gocryptfs mountpoint
-    ├── files/     # stored files
-    │   └── ...
-    └── db/        # SQLite database
-        └── hidden.db
-
-/mnt/backup/hidden/        # backup repository example location
-└── ...
 ```
+
+
+
+
+
 
 Processes:
 

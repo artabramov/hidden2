@@ -14,6 +14,8 @@ class Config(BaseSettings):
 
     MAINTENANCE_LOCK_PATH: str
 
+    SECRETS_DIR: str
+
     GOCRYPTFS_CIPHERDIR: str
     GOCRYPTFS_MOUNTPOINT: str
     GOCRYPTFS_PASSPHRASE_LENGTH: int
