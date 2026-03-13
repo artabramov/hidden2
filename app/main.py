@@ -17,6 +17,9 @@ from app.middleware.request_logging_middleware import request_logging_middleware
 from app.middleware.request_uuid_middleware import request_uuid_middleware
 from app.middleware.security_headers_middleware import security_headers_middleware
 from app.middleware.maintenance_lock_middleware import maintenance_lock_middleware
+from app.middleware.gocryptfs_key_middleware import gocryptfs_key_middleware
+
+from app.routers.health_router import router as health_router
 
 
 @asynccontextmanager
@@ -32,6 +35,7 @@ app = FastAPI(
 )
 
 app.middleware("http")(maintenance_lock_middleware)
+app.middleware("http")(gocryptfs_key_middleware)
 app.middleware("http")(request_logging_middleware)
 app.middleware("http")(request_uuid_middleware)
 app.middleware("http")(security_headers_middleware)
@@ -44,6 +48,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(health_router)
+
+
 @app.get("/")
 async def root(
     orm_repo: ORMRepository = Depends(get_orm_repository),
@@ -52,11 +59,6 @@ async def root(
     await orm_repo.insert(user, commit=True)
     selected_user = await orm_repo.select(User, name="name5")
     return {"app": "hidden", "status": "ok"}
-
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
 
 
 @app.get("/metrics")

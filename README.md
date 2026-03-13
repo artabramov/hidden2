@@ -76,6 +76,7 @@ Hidden supports multi-user access with role-based permissions and multi-factor a
     ├── main.py          # FastAPI application entrypoint
     ├── middleware/
     │   ├── maintenance_lock_middleware.py
+    │   ├── gocryptfs_key_middleware.py
     │   ├── request_logging_middleware.py
     │   ├── request_uuid_middleware.py
     │   └── security_headers_middleware.py

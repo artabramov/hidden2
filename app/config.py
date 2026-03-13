@@ -21,7 +21,8 @@ class Config(BaseSettings):
     GOCRYPTFS_PASSPHRASE_LENGTH: int
     GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS: int
 
-    RESTIC_ENABLED: bool
+    RESTIC_ENABLED: int
+    RESTIC_PASSWORD_LENGTH: Optional[int] = None
     RESTIC_REPOSITORY: Optional[str] = None
     RESTIC_CRON_SCHEDULE: Optional[str] = None
     RESTIC_FORGET_ARGS: Optional[str] = None
