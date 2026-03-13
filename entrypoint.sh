@@ -118,6 +118,10 @@ if [ "$RESTIC_ENABLED" = 1 ]; then
   fi
 fi
 
+DB_DIR="$GOCRYPTFS_MOUNTPOINT/db"
+FILES_DIR="$GOCRYPTFS_MOUNTPOINT/files"
+mkdir -p "$DB_DIR" "$FILES_DIR"
+
 # Watchdog:
 # - mount when passphrase exists and storage is not mounted
 # - unmount when passphrase disappears

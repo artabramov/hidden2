@@ -18,7 +18,7 @@ class Base(DeclarativeBase):
 
 
 engine = create_async_engine(
-    config.sqlite_url,
+    config.SQLITE_URL,
 )
 
 SessionLocal = async_sessionmaker(

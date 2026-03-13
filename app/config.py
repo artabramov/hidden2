@@ -40,14 +40,22 @@ class Config(BaseSettings):
     )
 
     @property
-    def sqlite_path(self) -> str:
-        """Absolute filesystem path to the SQLite database file."""
-        return os.path.join(self.GOCRYPTFS_MOUNTPOINT, "hidden.db")
+    def GOCRYPTFS_KEY_PATH(self) -> str:
+        """Absolute filesystem path to the gocryptfs passphrase file."""
+        return os.path.join(config.SECRETS_DIR, "gocryptfs.key")
+
 
     @property
-    def sqlite_url(self) -> str:
+    def SQLITE_PATH(self) -> str:
+        return os.path.join(
+            self.GOCRYPTFS_MOUNTPOINT,
+            "db/hidden.db"
+        )
+
+    @property
+    def SQLITE_URL(self) -> str:
         """SQLAlchemy database URL for the SQLite backend."""
-        return "sqlite+aiosqlite:///" + self.sqlite_path
+        return "sqlite+aiosqlite:///" + self.SQLITE_PATH
 
 
 config = Config()
