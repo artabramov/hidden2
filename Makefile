@@ -13,7 +13,7 @@ develop:
 	docker run -dit --init --restart unless-stopped -p 80:80 \
 	--cap-add SYS_ADMIN --device /dev/fuse --security-opt apparmor:unconfined \
 	-v hidden-data:/var/lib/hidden/encrypted \
-	-v hidden-secrets:/etc/hidden \
+	-v hidden-secrets:/media/secrets \
 	-v $$HOME/.ssh:/root/.ssh:ro --name hidden hidden
 
 install:
