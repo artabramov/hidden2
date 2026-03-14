@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-echo "[restic] backup job started"
+echo "[restic] backup started"
 
 set -a
 . /etc/hidden/.env
@@ -17,4 +17,4 @@ echo "[restic] prune started"
 restic --repo "$RESTIC_REPOSITORY" --password-file "$RESTIC_KEY_PATH" \
   forget $RESTIC_FORGET_ARGS --prune
 
-echo "[restic] backup job finished"
+echo "[restic] backup finished"

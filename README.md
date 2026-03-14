@@ -159,3 +159,6 @@ touch /var/lib/hidden/.lock
 
 Выключить
 rm /var/lib/hidden/.lock
+
+
+restic -r /media/backups --password-file /media/secrets/restic.key snapshots
