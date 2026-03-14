@@ -2,5 +2,6 @@ aiosqlite==0.22.1
 fastapi==0.115.0
 pydantic-settings==2.13.1
 PyJWT[crypto]==2.12.1
+pyotp==2.9.0
 SQLAlchemy==2.0.48
 uvicorn[standard]==0.30.6
