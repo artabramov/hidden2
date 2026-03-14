@@ -116,3 +116,8 @@ class User(Base):
         nullable=False,
         index=True,
     )
+
+    summary: Mapped[str | None] = mapped_column(
+        String(4096),
+        nullable=True,
+    )
