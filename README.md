@@ -35,12 +35,26 @@ Hidden supports multi-user access with role-based permissions and multi-factor a
 └── decrypted/     # gocryptfs mountpoint
     ├── files/     # stored files
     │   └── ...
-    └── db/        # SQLite database
-        └── ...
+    ├── db/        # SQLite database
+    │   └── ...
+    └── jwt.key
 ```
 
 
-
+```sh
+host
+  └─ container
+        └─ entrypoint
+              ├─ secrets
+              ├─ gocryptfs
+              ├─ restic
+              ├─ watchdog
+              └─ uvicorn
+                     └─ FastAPI
+                          ├─ middleware guards
+                          ├─ config
+                          └─ services
+```
 
 
 

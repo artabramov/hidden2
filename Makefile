@@ -14,6 +14,7 @@ develop:
 	--cap-add SYS_ADMIN --device /dev/fuse --security-opt apparmor:unconfined \
 	-v hidden-data:/var/lib/hidden/encrypted \
 	-v hidden-secrets:/media/secrets \
+	-v hidden-backups:/media/backups \
 	-v $$HOME/.ssh:/root/.ssh:ro --name hidden hidden
 
 install:

@@ -20,6 +20,8 @@ set +a
 
 # Validate environment variables.
 : "${SECRETS_DIR:?SECRETS_DIR is not defined}"
+: "${JWT_SIGNING_KEY_PATH:?JWT_SIGNING_KEY_PATH is not defined}"
+: "${JWT_SIGNING_KEY_LENGTH:?JWT_SIGNING_KEY_LENGTH is not defined}"
 : "${GOCRYPTFS_CIPHERDIR:?GOCRYPTFS_CIPHERDIR is not defined}"
 : "${GOCRYPTFS_MOUNTPOINT:?GOCRYPTFS_MOUNTPOINT is not defined}"
 : "${GOCRYPTFS_PASSPHRASE_LENGTH:?GOCRYPTFS_PASSPHRASE_LENGTH is not defined}"
@@ -100,6 +102,24 @@ then
   echo "[gocryptfs] mounted: $GOCRYPTFS_MOUNTPOINT"
 fi
 
+# JWT: generate signing key once.
+if [ ! -s "$JWT_SIGNING_KEY_PATH" ]; then
+  tr -dc 'A-Za-z0-9' </dev/urandom | head -c "$JWT_SIGNING_KEY_LENGTH" \
+    >"$JWT_SIGNING_KEY_PATH" || true
+  if [ -s "$JWT_SIGNING_KEY_PATH" ]; then
+    chmod 600 "$JWT_SIGNING_KEY_PATH"
+    echo "[jwt] signing key generated: $JWT_SIGNING_KEY_PATH"
+  else
+    echo "[fatal] failed to generate JWT signing key: $JWT_SIGNING_KEY_PATH" >&2
+    exit 1
+  fi
+fi
+
+# Create directories inside gocryptfs storage.
+DB_DIR="$GOCRYPTFS_MOUNTPOINT/db"
+FILES_DIR="$GOCRYPTFS_MOUNTPOINT/files"
+mkdir -p "$DB_DIR" "$FILES_DIR"
+
 # Restic: initialize repository exactly once.
 if [ "$RESTIC_ENABLED" = 1 ]; then
   # This line must be removed if RESTIC_REPOSITORY
@@ -117,10 +137,6 @@ if [ "$RESTIC_ENABLED" = 1 ]; then
     echo "[restic] initialized: $RESTIC_REPOSITORY"
   fi
 fi
-
-DB_DIR="$GOCRYPTFS_MOUNTPOINT/db"
-FILES_DIR="$GOCRYPTFS_MOUNTPOINT/files"
-mkdir -p "$DB_DIR" "$FILES_DIR"
 
 # Watchdog:
 # - mount when passphrase exists and storage is not mounted
@@ -157,6 +173,13 @@ fi
     sleep "$GOCRYPTFS_WATCHDOG_INTERVAL_SECONDS"
   done
 ) &
+
+# Configure restic cron job
+crontab -r 2>/dev/null || true
+if [ "${RESTIC_ENABLED}" = 1 ]; then
+  echo "$RESTIC_CRON_SCHEDULE /opt/hidden/backup.sh >> /proc/1/fd/1 2>> /proc/1/fd/2" | crontab -
+fi
+cron
 
 # Select uvicorn binary.
 if [ -x /opt/hidden/.venv/bin/uvicorn ]; then
