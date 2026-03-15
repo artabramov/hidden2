@@ -11,6 +11,7 @@ from app.schemas.user_register import (
 )
 from app.services.user_register import register_user
 from app.errors import UsernameAlreadyExistsError
+from app.config import config
 
 
 router = APIRouter(

@@ -15,7 +15,10 @@ The architecture follows a microkernel approach: functionality can be extended w
 Hidden supports multi-user access with role-based permissions and multi-factor authentication.
 
 ```bash
-/opt/hidden/       # application code
+/opt/hidden/
+├── app/           # application core
+├── extensions/    # custom extensions
+├── entrypoint.sh
 └── ...
 
 /etc/hidden/
@@ -102,6 +105,9 @@ host
 │   ├── errors.py
 │   ├── log.py
 │   └── main.py
+├── extensions/
+│   ├── example_extension.py
+│   └── ...
 ├── .dockerignore
 ├── .env.example
 ├── .gitattributes

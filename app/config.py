@@ -4,6 +4,10 @@ from pydantic import PrivateAttr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+EXTENSIONS_PATH = "/opt/hidden/extensions"
+
+
+
 class Config(BaseSettings):
     """
     Config values are provided by the runtime environment (entrypoint
@@ -41,8 +45,11 @@ class Config(BaseSettings):
     UVICORN_HOST: str
     UVICORN_PORT: int
 
+    EXTENSIONS_ENABLED_LIST: Optional[str] = None
+
     _jwt_signing_key: str = PrivateAttr()
     _fernet_key: str = PrivateAttr()
+    _extensions_list: list[str] = PrivateAttr(default_factory=list)
 
     model_config = SettingsConfigDict(
         extra="ignore",
@@ -56,6 +63,37 @@ class Config(BaseSettings):
 
         with open(self.FERNET_KEY_PATH, "r", encoding="utf-8") as f:
             self._fernet_key = f.read().strip()
+
+        self._extensions_list = self._get_extensions_list()
+
+    def _get_extensions_list(self) -> list[str]:
+        """
+        Build normalized list of enabled extensions based on:
+        1. EXTENSIONS_ENABLED_LIST env variable
+        2. Existing directories inside extensions/
+        """
+        if not self.EXTENSIONS_ENABLED_LIST:
+            return []
+
+        requested = [
+            name.strip()
+            for name in self.EXTENSIONS_ENABLED_LIST.split(",")
+            if name.strip()
+        ]
+
+        installed = {
+            name
+            for name in os.listdir(EXTENSIONS_PATH)
+            if os.path.isdir(os.path.join(EXTENSIONS_PATH, name))
+        }
+
+        missing = [name for name in requested if name not in installed]
+        if missing:
+            raise ValueError(
+                "Missing extensions: " + ", ".join(missing)
+            )
+
+        return requested
 
     @property
     def GOCRYPTFS_KEY_PATH(self) -> str:
@@ -84,6 +122,10 @@ class Config(BaseSettings):
     @property
     def FERNET_KEY(self) -> str:
         return self._fernet_key
+
+    @property
+    def EXTENSIONS_LIST(self) -> list[str]:
+        return self._extensions_list.copy()
 
 
 config = Config()
