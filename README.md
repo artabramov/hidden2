@@ -63,16 +63,16 @@ host
 
 
 ```bash
-/opt/hidden/           # application code (git repository)
-├── .vscode/           # editor configuration (VSCode)
+/opt/hidden/
+├── .vscode/
 │   ├── launch.json
 │   └── settings.json
 ├── .dockerignore
 ├── .gitattributes
 ├── .gitignore
-├── .env.example       # example environment config
+├── .env.example
 ├── Dockerfile
-├── entrypoint.sh      # universal startup script
+├── entrypoint.sh
 ├── Makefile
 ├── requirements.txt
 ├── README.md
@@ -86,27 +86,28 @@ host
     ├── config.py
     ├── db.py
     ├── dependencies.py
+    ├── errors.py
     ├── logging.py
-    ├── main.py          # FastAPI application entrypoint
+    ├── main.py
     ├── middleware/
     │   ├── maintenance_lock_middleware.py
     │   ├── gocryptfs_key_middleware.py
     │   ├── request_logging_middleware.py
     │   ├── request_uuid_middleware.py
     │   └── security_headers_middleware.py
-    ├── models/    # SQLAlchemy ORM models
+    ├── models/
     │   └── ...
-    ├── schemas/   # Pydantic API schemas
+    ├── schemas/
     │   └── ...
-    ├── routers/   # HTTP endpoints
+    ├── routers/
+    │   ├── user_register_router.py
     │   └── ...
-    ├── services/  # application business logic
-    │   ├── auth_service.py  # логин, токены, проверка учетных данных
-    │   ├── file_service.py  # загрузка, обработка, перемещение файлов
+    ├── services/
+    │   ├── user_register_service.py
     │   └── ...
     └── repositories/
-        ├── file_repository.py  # работа с файлами
-        └── orm_repository.py   # работа с базой данных (CRUDL)
+        ├── file_repository.py
+        └── orm_repository.py
 ```
 
 
