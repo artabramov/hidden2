@@ -115,6 +115,16 @@ if [ ! -s "$JWT_SIGNING_KEY_PATH" ]; then
   fi
 fi
 
+# Cryptography: generate fernet key once.
+if [ ! -f "$FERNET_KEY_PATH" ]; then
+  python3 - << 'EOF' > "$FERNET_KEY_PATH"
+from cryptography.fernet import Fernet
+print(Fernet.generate_key().decode())
+EOF
+  chmod 600 "$FERNET_KEY_PATH"
+  echo "[security] fernet key generated"
+fi
+
 # Create directories inside gocryptfs storage.
 DB_DIR="$GOCRYPTFS_MOUNTPOINT/db"
 FILES_DIR="$GOCRYPTFS_MOUNTPOINT/files"

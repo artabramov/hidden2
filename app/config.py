@@ -17,6 +17,8 @@ class Config(BaseSettings):
 
     SECRETS_DIR: str
 
+    FERNET_KEY_PATH: str
+
     JWT_SIGNING_KEY_PATH: str
     JWT_SIGNING_KEY_LENGTH: int
 

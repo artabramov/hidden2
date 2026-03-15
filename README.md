@@ -37,6 +37,7 @@ Hidden supports multi-user access with role-based permissions and multi-factor a
     │   └── ...
     ├── db/        # SQLite database
     │   └── ...
+    ├── fernet.key
     └── jwt.key
 ```
 
@@ -89,10 +90,10 @@ host
     ├── errors.py
     ├── logging.py
     ├── main.py
-    ├── security/
+    ├── cryptography/
     │   ├── 
-    │
-    │
+    │   ├── 
+    │   └──
     ├── middleware/
     │   ├── maintenance_lock_middleware.py
     │   ├── gocryptfs_key_middleware.py
