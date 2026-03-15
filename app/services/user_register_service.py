@@ -3,10 +3,12 @@ from uuid import uuid4
 import pyotp
 
 from app.models.user import User
-from app.repositories.orm import ORMRepository
-from app.schemas.user import UserRegisterRequest
-from app.security.encryption import encrypt_string
-from app.security.password import hash_password
+from app.repositories.orm_repository import ORMRepository
+from app.schemas.user_register_request import UserRegisterRequest
+from app.cryptography.data_encryption import encrypt_string
+from app.cryptography.password_hash import hash_password
+from app.cryptography.totp_validation import generate_totp_secret
+from app.cryptography.jti_generation import generate_jti
 from app.errors import UsernameAlreadyExistsError
 
 
@@ -14,6 +16,7 @@ async def register_user(
     repository: ORMRepository,
     data: UserRegisterRequest,
 ) -> tuple[User, str]:
+
     existing_user = await repository.select(
         User, username=data.username,
     )
@@ -21,8 +24,8 @@ async def register_user(
     if existing_user is not None:
         raise UsernameAlreadyExistsError
 
-    totp_secret = pyotp.random_base32()
-    current_jti = str(uuid4())
+    totp_secret = generate_totp_secret()
+    current_jti = generate_jti()
 
     user = User(
         username=data.username,

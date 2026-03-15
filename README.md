@@ -79,10 +79,7 @@ host
 ├── README.md
 ├── alembic.ini
 ├── alembic/
-│   ├── env.py
-│   ├── script.py.mako
-│   └── versions/
-│       └── ...
+│   └── ...
 └── app/
     ├── config.py
     ├── db.py
@@ -91,9 +88,10 @@ host
     ├── logging.py
     ├── main.py
     ├── cryptography/
-    │   ├── 
-    │   ├── 
-    │   └──
+    │   ├── data_encryption.py
+    │   ├── jti_generation.py
+    │   ├── password_hash.py
+    │   └── totp_validation.py
     ├── middleware/
     │   ├── maintenance_lock_middleware.py
     │   ├── gocryptfs_key_middleware.py

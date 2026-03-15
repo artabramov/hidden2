@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic_core import PydanticCustomError
 
 
 class UserRegisterRequest(BaseModel):
@@ -19,12 +20,12 @@ class UserRegisterRequest(BaseModel):
         allowed = set(
             "abcdefghijklmnopqrstuvwxyz"
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "0123456789_-"
+            "0123456789_"
         )
         if not all(char in allowed for char in value):
-            raise ValueError(
-                "Username may contain only letters, digits, "
-                "underscore, and hyphen."
+            raise PydanticCustomError(
+                "invalid_characters",
+                "Must contain only letters, digits, underscore.",
             )
         return value
 
@@ -32,18 +33,21 @@ class UserRegisterRequest(BaseModel):
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not any(c.islower() for c in value):
-            raise ValueError(
-                "Password must contain at least one lowercase letter."
+            raise PydanticCustomError(
+                "no_lowercase",
+                "Password must contain at least one lowercase letter.",
             )
 
         if not any(c.isupper() for c in value):
-            raise ValueError(
-                "Password must contain at least one uppercase letter."
+            raise PydanticCustomError(
+                "no_uppercase",
+                "Password must contain at least one uppercase letter.",
             )
 
         if not any(c.isdigit() for c in value):
-            raise ValueError(
-                "Password must contain at least one digit."
+            raise PydanticCustomError(
+                "no_digit",
+                "Password must contain at least one digit.",
             )
 
         return value

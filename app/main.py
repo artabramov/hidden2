@@ -20,6 +20,15 @@ from app.middleware.maintenance_lock_middleware import maintenance_lock_middlewa
 from app.middleware.gocryptfs_key_middleware import gocryptfs_key_middleware
 
 from app.routers.health_router import router as health_router
+from app.routers.user_register_router import router as user_register
+from fastapi.responses import JSONResponse
+from fastapi import Request, status
+
+from app.errors import UsernameAlreadyExistsError
+from fastapi.exceptions import RequestValidationError
+
+from app.handlers.validation_error_handler import validation_error_handler
+from app.handlers.username_exists_handler import username_exists_handler
 
 
 @asynccontextmanager
@@ -32,6 +41,11 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="hidden",
     lifespan=lifespan,
+    swagger_ui_parameters={
+        "persistAuthorization": True,
+        "displayRequestDuration": True,
+        "tryItOutEnabled": True,
+    }
 )
 
 app.middleware("http")(maintenance_lock_middleware)
@@ -49,6 +63,18 @@ app.add_middleware(
 )
 
 app.include_router(health_router)
+app.include_router(user_register)
+
+app.add_exception_handler(
+    RequestValidationError,
+    validation_error_handler,
+)
+
+app.add_exception_handler(
+    UsernameAlreadyExistsError,
+    username_exists_handler,
+)
+
 
 
 @app.get("/")

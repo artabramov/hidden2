@@ -42,6 +42,7 @@ class Config(BaseSettings):
     UVICORN_PORT: int
 
     _jwt_signing_key: str = PrivateAttr()
+    _fernet_key: str = PrivateAttr()
 
     model_config = SettingsConfigDict(
         extra="ignore",
@@ -52,6 +53,9 @@ class Config(BaseSettings):
 
         with open(self.JWT_SIGNING_KEY_PATH, "r", encoding="utf-8") as f:
             self._jwt_signing_key = f.read().strip()
+
+        with open(self.FERNET_KEY_PATH, "r", encoding="utf-8") as f:
+            self._fernet_key = f.read().strip()
 
     @property
     def GOCRYPTFS_KEY_PATH(self) -> str:
@@ -76,6 +80,10 @@ class Config(BaseSettings):
     def JWT_SIGNING_KEY(self) -> str:
         """JWT signing secret loaded at startup and kept in memory."""
         return self._jwt_signing_key
+
+    @property
+    def FERNET_KEY(self) -> str:
+        return self._fernet_key
 
 
 config = Config()
