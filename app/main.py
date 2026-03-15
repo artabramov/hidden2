@@ -6,29 +6,29 @@ from app.config import config
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import init_db
 from app.dependencies import get_orm_repository
-from app.repositories.orm_repository import ORMRepository
+from app.repositories.orm import ORMRepository
 from app.models.folder import Folder
 from app.models.user import User
 
-from app.logging import init_logging
+from app.log import init_logging
 from starlette.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
-from app.middleware.request_logging_middleware import request_logging_middleware
-from app.middleware.request_uuid_middleware import request_uuid_middleware
-from app.middleware.security_headers_middleware import security_headers_middleware
-from app.middleware.maintenance_lock_middleware import maintenance_lock_middleware
-from app.middleware.gocryptfs_key_middleware import gocryptfs_key_middleware
+from app.middleware.request_logging import request_logging_middleware
+from app.middleware.request_uuid import request_uuid_middleware
+from app.middleware.security_headers import security_headers_middleware
+from app.middleware.maintenance_lock import maintenance_lock_middleware
+from app.middleware.gocryptfs_key import gocryptfs_key_middleware
 
 from app.routers.health_router import router as health_router
-from app.routers.user_register_router import router as user_register
+from app.routers.user_register import router as user_register
 from fastapi.responses import JSONResponse
 from fastapi import Request, status
 
 from app.errors import UsernameAlreadyExistsError
 from fastapi.exceptions import RequestValidationError
 
-from app.handlers.validation_error_handler import validation_error_handler
-from app.handlers.username_exists_handler import username_exists_handler
+from app.handlers.validation_error import validation_error_handler
+from app.handlers.username_exists import username_exists_handler
 
 
 @asynccontextmanager

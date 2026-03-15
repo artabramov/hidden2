@@ -1,4 +1,4 @@
-# security_headers_middleware.py
+# app/middleware/security_headers.py
 
 from fastapi import Request
 

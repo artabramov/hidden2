@@ -1,3 +1,5 @@
+# app/models/user.py
+
 from datetime import datetime
 from enum import StrEnum
 

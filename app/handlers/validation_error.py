@@ -1,4 +1,4 @@
-# app/handlers/request_validation_error_handler.py
+# app/handlers/validation_error.py
 
 from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError

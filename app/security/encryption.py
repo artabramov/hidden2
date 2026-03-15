@@ -1,3 +1,5 @@
+# app/security/encryption.py
+
 from cryptography.fernet import Fernet
 
 from app.config import config

@@ -1,4 +1,4 @@
-# app/middleware/request_logging_middleware.py
+# app/middleware/request_logging.py
 
 import logging
 import time

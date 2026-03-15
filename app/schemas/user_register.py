@@ -1,3 +1,5 @@
+# app/schemas/user_register_request.py
+
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic_core import PydanticCustomError
 
@@ -58,3 +60,15 @@ class UserRegisterRequest(BaseModel):
         if value == "":
             return None
         return value
+
+
+class UserRegisterResponse(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+    )
+
+    id: int
+    totp_secret: str = Field(
+        min_length=16,
+        max_length=255,
+    )

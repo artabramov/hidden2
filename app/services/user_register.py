@@ -1,14 +1,12 @@
 from uuid import uuid4
 
-import pyotp
-
 from app.models.user import User
-from app.repositories.orm_repository import ORMRepository
-from app.schemas.user_register_request import UserRegisterRequest
-from app.cryptography.data_encryption import encrypt_string
-from app.cryptography.password_hash import hash_password
-from app.cryptography.totp_validation import generate_totp_secret
-from app.cryptography.jti_generation import generate_jti
+from app.repositories.orm import ORMRepository
+from app.schemas.user_register import UserRegisterRequest
+from app.security.encryption import encrypt_string
+from app.security.hashing import hash_password
+from app.security.jti import generate_jti
+from app.security.totp import generate_totp_secret
 from app.errors import UsernameAlreadyExistsError
 
 

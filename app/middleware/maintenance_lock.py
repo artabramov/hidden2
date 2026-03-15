@@ -1,4 +1,4 @@
-# app/middleware/maintenance_lock_middleware.py
+# app/middleware/maintenance_lock.py
 
 import os
 

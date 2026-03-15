@@ -1,4 +1,4 @@
-# app/handlers/domain_error_handlers.py
+# app/handlers/username_exists.py
 
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
@@ -17,7 +17,7 @@ async def username_exists_handler(
                 {
                     "type": "already_exists",
                     "loc": "username",
-                    "msg": "Username already exists.",
+                    "msg": "Value already exists.",
                 }
             ]
         },

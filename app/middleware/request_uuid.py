@@ -1,4 +1,4 @@
-# app/middleware/request_uuid_middleware.py
+# app/middleware/request_uuid.py
 
 import uuid
 from fastapi import Request

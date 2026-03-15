@@ -68,49 +68,51 @@ host
 ├── .vscode/
 │   ├── launch.json
 │   └── settings.json
+├── alembic/
+│   └── ...
+├── app/
+│   ├── handlers/
+│   │   ├── username_exists.py
+│   │   └── validation_error.py
+│   ├── middleware/
+│   │   ├── gocryptfs_key.py
+│   │   ├── maintenance_lock.py
+│   │   ├── request_logging.py
+│   │   ├── request_uuid.py
+│   │   └── security_headers.py
+│   ├── models/
+│   │   └── user.py
+│   ├── repositories/
+│   │   ├── file.py
+│   │   └── orm.py
+│   ├── routers/
+│   │   └── user_register.py
+│   ├── schemas/
+│   │   └── user_register.py
+│   ├── security/
+│   │   ├── encryption.py
+│   │   ├── hashing.py
+│   │   ├── jti.py
+│   │   └── totp.py
+│   ├── services/
+│   │   └── user_register.py
+│   ├── config.py
+│   ├── db.py
+│   ├── dependencies.py
+│   ├── errors.py
+│   ├── log.py
+│   └── main.py
 ├── .dockerignore
+├── .env.example
 ├── .gitattributes
 ├── .gitignore
-├── .env.example
+├── alembic.ini
+├── backup.sh
 ├── Dockerfile
 ├── entrypoint.sh
 ├── Makefile
-├── requirements.txt
 ├── README.md
-├── alembic.ini
-├── alembic/
-│   └── ...
-└── app/
-    ├── config.py
-    ├── db.py
-    ├── dependencies.py
-    ├── errors.py
-    ├── logging.py
-    ├── main.py
-    ├── cryptography/
-    │   ├── data_encryption.py
-    │   ├── jti_generation.py
-    │   ├── password_hash.py
-    │   └── totp_validation.py
-    ├── middleware/
-    │   ├── maintenance_lock_middleware.py
-    │   ├── gocryptfs_key_middleware.py
-    │   ├── request_logging_middleware.py
-    │   ├── request_uuid_middleware.py
-    │   └── security_headers_middleware.py
-    ├── models/
-    │   └── ...
-    ├── schemas/
-    │   └── ...
-    ├── routers/
-    │   ├── user_register_router.py
-    │   └── ...
-    ├── services/
-    │   ├── user_register_service.py
-    │   └── ...
-    └── repositories/
-        ├── file_repository.py
-        └── orm_repository.py
+└── requirements.txt
 ```
 
 

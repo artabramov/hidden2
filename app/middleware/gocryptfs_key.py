@@ -1,4 +1,4 @@
-# app/middleware/gocryptfs_key_middleware.py
+# app/middleware/gocryptfs_key.py
 
 import os
 from fastapi import Request

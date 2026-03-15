@@ -9,7 +9,7 @@ router = APIRouter(tags=["health"])
 
 @router.get("/health")
 async def health():
-    from app.cryptography.data_encryption import encrypt_string, decrypt_string
+    from app.security.encryption import encrypt_string, decrypt_string
     str_encrypted = encrypt_string("qwerty123")
     str_decrypted = decrypt_string(str_encrypted)
     
